@@ -1,4 +1,4 @@
-/* 
+/*
  * Copyright (C) 2015 Binux <roy@binux.me>
  *
  * This file is part of YAAW (https://github.com/binux/yaaw).
@@ -49,7 +49,7 @@ if (typeof ARIA2=="undefined"||!ARIA2) var ARIA2=(function(){
     $("#main-alert .alert-msg").html(msg);
     $("#main-alert").data("msg_id", msg_id).show();
     if (timeout) {
-      window.setTimeout(function() { 
+      window.setTimeout(function() {
         if($("#main-alert").data("msg_id") == msg_id) {
           $("#main-alert").fadeOut();
         }
@@ -59,7 +59,7 @@ if (typeof ARIA2=="undefined"||!ARIA2) var ARIA2=(function(){
   }
 
   function bind_event(dom) {
-    dom.find("[rel=tooltip]").tooltip({"placement": "bottom"});
+    dom.find("[rel=tooltip]").tooltip({"placement": "bottom", trigger : 'hover'});
   }
 
   function get_title(result) {
@@ -249,7 +249,7 @@ if (typeof ARIA2=="undefined"||!ARIA2) var ARIA2=(function(){
           ARIA2.refresh();
           $("#add-task-modal").modal('hide');
           YAAW.add_task.clean();
-        }, 
+        },
         function(result) {
           //console.debug(result);
 
@@ -300,7 +300,7 @@ if (typeof ARIA2=="undefined"||!ARIA2) var ARIA2=(function(){
           ARIA2.refresh();
           $("#add-task-modal").modal('hide');
           YAAW.add_task.clean();
-        }, 
+        },
         function(result) {
           //console.debug(result);
 
@@ -321,7 +321,7 @@ if (typeof ARIA2=="undefined"||!ARIA2) var ARIA2=(function(){
           ARIA2.refresh();
           $("#add-task-modal").modal('hide');
           YAAW.add_task.clean();
-        }, 
+        },
         function(result) {
           //console.debug(result);
 
@@ -357,9 +357,7 @@ if (typeof ARIA2=="undefined"||!ARIA2) var ARIA2=(function(){
           //console.debug(result);
 
           if (select_lock) return;
-          if (!result.result) {
-            main_alert("alert-error", "<strong>Error: </strong>rpc result error.", 5000);
-          }
+         
 
           var snapshot = new Array();
           $.each(result.result, function(i, e) {
@@ -371,7 +369,7 @@ if (typeof ARIA2=="undefined"||!ARIA2) var ARIA2=(function(){
             if (auto_refresh && !select_lock)
               ARIA2.refresh();
           }
-        
+
           result = ARIA2.status_fix(result.result);
           $("#active-tasks-table").empty().append(YAAW.tpl.active_task({"tasks": result}));
           $.each(result, function(n, e) {
@@ -387,9 +385,7 @@ if (typeof ARIA2=="undefined"||!ARIA2) var ARIA2=(function(){
         function(result) {
           //console.debug(result);
 
-          if (!result.result) {
-            main_alert("alert-error", "<strong>Error: </strong>rpc result error.", 5000);
-          }
+          
 
           var snapshot = new Array();
           $.each(result.result, function(i, e) {
@@ -412,9 +408,7 @@ if (typeof ARIA2=="undefined"||!ARIA2) var ARIA2=(function(){
       ARIA2.request("tellWaiting", params,
         function(result) {
           if (select_lock) return;
-          if (!result.result) {
-            main_alert("alert-error", "<strong>Error: </strong>rpc result error.", 5000);
-          }
+
 
           result = ARIA2.status_fix(result.result);
           $("#waiting-tasks-table").empty().append(YAAW.tpl.other_task({"tasks": result}));
@@ -438,9 +432,7 @@ if (typeof ARIA2=="undefined"||!ARIA2) var ARIA2=(function(){
           //console.debug(result);
           if (select_lock) return;
 
-          if (!result.result) {
-            main_alert("alert-error", "<strong>Error: </strong>rpc result error.", 5000);
-          }
+          
 
           result = ARIA2.status_fix(result.result);
 
@@ -459,6 +451,11 @@ if (typeof ARIA2=="undefined"||!ARIA2) var ARIA2=(function(){
                 return;
               if (ARIA2.finish_notification) {
                 YAAW.notification("Aria2 Task Finished", e.title);
+                MacGap.notify({
+                              // type: 'sheet',
+                              title: e.title,
+                              content: 'Aria2 Task Finished',
+                              });
               }
               finished_tasks_list.push(e.gid);
             });
@@ -667,9 +664,7 @@ if (typeof ARIA2=="undefined"||!ARIA2) var ARIA2=(function(){
     get_global_option: function() {
       ARIA2.request("getGlobalOption", [],
         function(result) {
-          if (!result.result)
-            main_alert("alert-error", "<strong>Error: </strong>rpc result error.", 5000);
-
+          
           result = result.result;
           $("#aria2-gsetting").empty().append(YAAW.tpl.aria2_global_setting(result));
         }
@@ -679,9 +674,7 @@ if (typeof ARIA2=="undefined"||!ARIA2) var ARIA2=(function(){
     init_add_task_option: function() {
       ARIA2.request("getGlobalOption", [],
         function(result) {
-          if (!result.result)
-            main_alert("alert-error", "<strong>Error: </strong>rpc result error.", 5000);
-
+        
           result = result.result;
           result["parameterized-uri"] = (result["parameterized-uri"] == "true" ? true : false)
           $("#add-task-option-wrap").empty().append(YAAW.tpl.add_task_option(result));
@@ -692,9 +685,6 @@ if (typeof ARIA2=="undefined"||!ARIA2) var ARIA2=(function(){
     change_global_option: function(options) {
       ARIA2.request("changeGlobalOption", [options],
         function(result) {
-          if (!result.result)
-            main_alert("alert-error", "<strong>Error: </strong>rpc result error.", 5000);
-          else
             main_alert("alert-success", "Saved", 2000);
         }
       );
@@ -703,9 +693,7 @@ if (typeof ARIA2=="undefined"||!ARIA2) var ARIA2=(function(){
     global_stat: function() {
       ARIA2.request("getGlobalStat", [],
         function(result) {
-          if (!result.result) {
-            main_alert("alert-error", "<strong>Error: </strong>rpc result error.", 5000);
-          }
+
 
           result = result.result;
           var _tasks_cnt_snapshot = ""+result.numActive+","+result.numWaiting+","+result.numStopped;
@@ -721,8 +709,12 @@ if (typeof ARIA2=="undefined"||!ARIA2) var ARIA2=(function(){
           var title = "↓"+YAAW.tpl.view.format_size_0()(result.downloadSpeed);
           if (result.uploadSpeed > 0)
             title += " ↑"+YAAW.tpl.view.format_size_0()(result.uploadSpeed);
-          title += " - Aria2GUI";
+          title += " - Yet Another Aria2 Web Frontend";
           document.title = title;
+          if (result.downloadSpeed > 0)
+              MacGap.Dock.addBadge(YAAW.tpl.view.format_size_0()(result.downloadSpeed));
+          else
+              MacGap.Dock.removeBadge();
         }
       );
     },
@@ -730,9 +722,7 @@ if (typeof ARIA2=="undefined"||!ARIA2) var ARIA2=(function(){
     get_version: function() {
       ARIA2.request("getVersion", [],
         function(result) {
-          if (!result.result) {
-            main_alert("alert-error", "<strong>Error: </strong>rpc result error.", 5000);
-          }
+
 
           $("#global-version").text("Aria2 "+result.result.version || "");
         }
@@ -742,9 +732,7 @@ if (typeof ARIA2=="undefined"||!ARIA2) var ARIA2=(function(){
     get_status: function(gid) {
       ARIA2.request("tellStatus", [gid],
         function(result) {
-          if (!result.result) {
-            main_alert("alert-error", "<strong>Error: </strong>rpc result error.", 5000);
-          }
+
 
           result = result.result;
           for (var i=0; i<result.files.length; i++) {
@@ -754,6 +742,8 @@ if (typeof ARIA2=="undefined"||!ARIA2) var ARIA2=(function(){
           };
           $("#ib-status").empty().append(YAAW.tpl.ib_status(result));
           $("#ib-files .file-list").empty().append(YAAW.tpl.files_tree(result.files));
+          if ($("#task-gid-"+gid).attr("data-status") == "active")
+            $("#ib-file-save").hide();
           if (result.bittorrent) {
             $("#ib-peers-a").show();
           }
@@ -764,11 +754,8 @@ if (typeof ARIA2=="undefined"||!ARIA2) var ARIA2=(function(){
     change_option: function(gid, options) {
       ARIA2.request("changeOption", [gid, options],
         function(result) {
-          if (!result.result) {
-            main_alert("alert-error", "<strong>Error: </strong>rpc result error.", 5000);
-          } else {
-            main_alert("alert-success", "Change Options OK!", 2000);
-          }
+          main_alert("alert-success", "Change Options OK!", 2000);
+          
         }
       );
     },
